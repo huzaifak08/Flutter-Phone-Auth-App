@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:phone_auth_app/Provider/auth_provider.dart';
+import 'package:phone_auth_app/Screens/home_screen.dart';
 import 'package:phone_auth_app/Screens/register_screen.dart';
 import 'package:phone_auth_app/Widget/custom_widget.dart';
+import 'package:provider/provider.dart';
+
+import '../Utils/utils.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -12,6 +17,9 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
+    // Provider:
+    final ap = Provider.of<AuthProvider>(context, listen: false);
+
     return Scaffold(
       body: SafeArea(
           child: Center(
@@ -42,11 +50,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 height: 50,
                 child: CustomButton(
                   text: 'Get Started',
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const RegisterScreen()));
+                  onPressed: () async {
+                    if (ap.isSignedIn == true) {
+                      ap.getDataFromSP().whenComplete(() {
+                        nextScreenReplacement(context, const HomeScreen());
+                      });
+                    } else {
+                      nextScreenReplacement(context, const RegisterScreen());
+                    }
                   },
                 ),
               )
